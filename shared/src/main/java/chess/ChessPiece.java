@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -67,7 +69,15 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(myPosition);
+        PieceMoveCalc cal;
+        if (piece.getPieceType()==PieceType.BISHOP){
+            cal = new BishopMove(board,myPosition,piece);
+        }
+        else{
+            return List.of();
+        }
+        return cal.pieceMove();
     }
 
     @Override
@@ -76,5 +86,58 @@ public class ChessPiece {
                 "pieceColor=" + pieceColor +
                 ", type=" + type +
                 '}';
+    }
+}
+abstract class PieceMoveCalc{
+    protected ChessBoard board;
+    protected ChessPosition position;
+    protected ChessPiece piece;
+
+    public PieceMoveCalc(ChessBoard board, ChessPosition position, ChessPiece piece){
+        this.board = board;
+        this.position = position;
+        this.piece = piece;
+    }
+    public abstract Collection<ChessMove> pieceMove();
+    protected static final int[][] STRAIGHT_DIRECTION = {{0,1}, {1, 0}, {0,-1},{-1,0}};
+    protected static final int[][] DIAGONAL_DIRECTION = {{1,1}, {1, -1}, {-1,-1},{-1,1}};
+
+    protected boolean inRange(int row, int col){
+        return row<=8 && row>=1 && col>=1 && col<=8;
+    }
+
+    protected void addMove(Collection<ChessMove> moves, int[][] directions){
+        int row = position.getRow();
+        int col = position.getColumn();
+        for (int [] direction:directions){
+            int r = row + direction[0];
+            int c = col + direction[1];
+            while (inRange(r,c)){
+                ChessPosition end = new ChessPosition(r,c);
+                if (board.getPiece(end) == null){
+                    moves.add(new ChessMove(position, end, null));
+                }
+                else if (board.getPiece(end).getTeamColor() != piece.getTeamColor()){
+                    moves.add(new ChessMove(position, end, null));
+                    break;
+                }
+                else {
+                    break;
+                }
+                r+=direction[0];
+                c+=direction[1];
+            }
+        }
+    }
+}
+class BishopMove extends PieceMoveCalc{
+    public BishopMove(ChessBoard board, ChessPosition position, ChessPiece piece){
+        super(board,position,piece);
+    }
+    @Override
+    public Collection<ChessMove> pieceMove(){
+        Collection<ChessMove> moves = new ArrayList<>();
+        addMove(moves,DIAGONAL_DIRECTION);
+        return moves;
     }
 }
