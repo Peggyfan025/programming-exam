@@ -74,6 +74,12 @@ public class ChessPiece {
         if (piece.getPieceType()==PieceType.BISHOP){
             cal = new BishopMove(board,myPosition,piece);
         }
+        else if (piece.getPieceType()==PieceType.ROOK){
+            cal = new RookMove(board,myPosition,piece);
+        }
+        else if (piece.getPieceType()==PieceType.QUEEN){
+            cal = new QueenMove(board,myPosition,piece);
+        }
         else{
             return List.of();
         }
@@ -138,6 +144,29 @@ class BishopMove extends PieceMoveCalc{
     public Collection<ChessMove> pieceMove(){
         Collection<ChessMove> moves = new ArrayList<>();
         addMove(moves,DIAGONAL_DIRECTION);
+        return moves;
+    }
+}
+class RookMove extends PieceMoveCalc{
+    public RookMove(ChessBoard board, ChessPosition position, ChessPiece piece){
+        super(board,position,piece);
+    }
+    @Override
+    public Collection<ChessMove> pieceMove(){
+        Collection<ChessMove> moves = new ArrayList<>();
+        addMove(moves,STRAIGHT_DIRECTION);
+        return moves;
+    }
+}
+class QueenMove extends PieceMoveCalc{
+    public QueenMove(ChessBoard board, ChessPosition position, ChessPiece piece){
+        super(board,position,piece);
+    }
+    @Override
+    public Collection<ChessMove> pieceMove(){
+        Collection<ChessMove> moves = new ArrayList<>();
+        addMove(moves,DIAGONAL_DIRECTION);
+        addMove(moves,STRAIGHT_DIRECTION);
         return moves;
     }
 }
