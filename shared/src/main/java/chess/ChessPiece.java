@@ -80,6 +80,9 @@ public class ChessPiece {
         else if (piece.getPieceType()==PieceType.QUEEN){
             cal = new QueenMove(board,myPosition,piece);
         }
+        else if (piece.getPieceType()==PieceType.KNIGHT){
+            cal = new KnightMove(board,myPosition,piece);
+        }
         else{
             return List.of();
         }
@@ -167,6 +170,55 @@ class QueenMove extends PieceMoveCalc{
         Collection<ChessMove> moves = new ArrayList<>();
         addMove(moves,DIAGONAL_DIRECTION);
         addMove(moves,STRAIGHT_DIRECTION);
+        return moves;
+    }
+}
+class KnightMove extends PieceMoveCalc{
+    public KnightMove(ChessBoard board, ChessPosition position, ChessPiece piece){
+        super(board,position,piece);
+    }
+    int[][] knight_direction = {{2,1}, {-2, 1}, {-2, -1}, {2,-1}, {1, 2}, {1, -2},{-1,2},{-1,-2}};
+    @Override
+    public Collection<ChessMove> pieceMove(){
+        Collection<ChessMove> moves = new ArrayList<>();
+        int row = position.getRow();
+        int col = position.getColumn();
+        for (int[] direction:knight_direction){
+            int r = row + direction[0];
+            int c = col + direction[1];
+
+            if (inRange(r,c)){
+                ChessPosition end = new ChessPosition(r,c);
+                if (board.getPiece(end) == null){
+                    moves.add(new ChessMove(position,end,null));
+                }
+                else if (board.getPiece(end).getTeamColor() != piece.getTeamColor()){
+                    moves.add(new ChessMove(position,end,null));
+                }
+            }
+        }
+        return moves;
+    }
+}
+class KingMove extends PieceMoveCalc{
+    public KingMove(ChessBoard board, ChessPosition position, ChessPiece piece){
+        super(board,position,piece);
+    }
+    @Override
+    public Collection<ChessMove> pieceMove(){
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        return moves;
+    }
+}
+class PawnMove extends PieceMoveCalc{
+    public PawnMove(ChessBoard board, ChessPosition position, ChessPiece piece){
+        super(board,position,piece);
+    }
+    @Override
+    public Collection<ChessMove> pieceMove(){
+        Collection<ChessMove> moves = new ArrayList<>();
+
         return moves;
     }
 }
