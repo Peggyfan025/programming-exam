@@ -237,10 +237,59 @@ class PawnMove extends PieceMoveCalc{
     public PawnMove(ChessBoard board, ChessPosition position, ChessPiece piece){
         super(board,position,piece);
     }
+    private void addPawnMove(Collection<ChessMove> moves, ChessPosition end, int promotionrow){
+        if (end.getRow() == promotionrow){
+            moves.add(new ChessMove(position, end, ChessPiece.PieceType.BISHOP));
+            moves.add(new ChessMove(position, end, ChessPiece.PieceType.QUEEN));
+            moves.add(new ChessMove(position, end, ChessPiece.PieceType.KNIGHT));
+            moves.add(new ChessMove(position, end, ChessPiece.PieceType.ROOK));
+        }
+        else {
+            moves.add(new ChessMove(position, end, null));
+        }
+    }
+
     @Override
     public Collection<ChessMove> pieceMove(){
         Collection<ChessMove> moves = new ArrayList<>();
+        int row = position.getRow();
+        int col = position.getColumn();
+        int startrow;
+        int promotionrow;
+        int direction;
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+            startrow = 7;
+            promotionrow = 1;
+            direction = -1;
+        }
+        else {
+            startrow = 2;
+            promotionrow = 8;
+            direction = 1;
+        }
 
+        ChessPosition oneForward = new ChessPosition(row+direction, col);
+        if (inRange(row+direction,col) && board.getPiece(oneForward) == null){
+            addPawnMove(moves, oneForward, promotionrow);
+
+            ChessPosition twoForward = new ChessPosition(row+(direction*2), col);
+            if (inRange(row+(direction*2), col) && board.getPiece(twoForward) == null && row == startrow){
+                moves.add(new ChessMove(position, twoForward, null));
+            }
+        }
+
+        //capture
+        int[] cap_cols = {col-1, col+1};
+        for (int cap_col:cap_cols){
+            int cap_row = row+direction;
+            ChessPosition cap_position = new ChessPosition(cap_row, cap_col);
+            if (inRange(cap_row, cap_col)){
+                ChessPiece cap_piece = board.getPiece(cap_position);
+                if(cap_piece!=null && cap_piece.getTeamColor() != piece.getTeamColor()){
+                    addPawnMove(moves, cap_position, promotionrow);
+                }
+            }
+        }
         return moves;
     }
 }

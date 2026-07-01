@@ -50,6 +50,6 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return String.format("%s%s",row, col);
+        return String.format("%s,%s",row, col);
     }
 }
