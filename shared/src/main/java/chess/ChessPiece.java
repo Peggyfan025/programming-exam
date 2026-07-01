@@ -83,6 +83,12 @@ public class ChessPiece {
         else if (piece.getPieceType()==PieceType.KNIGHT){
             cal = new KnightMove(board,myPosition,piece);
         }
+        else if (piece.getPieceType()==PieceType.KING){
+            cal = new KingMove(board,myPosition,piece);
+        }
+        else if (piece.getPieceType()==PieceType.PAWN){
+            cal = new PawnMove(board,myPosition,piece);
+        }
         else{
             return List.of();
         }
@@ -204,10 +210,26 @@ class KingMove extends PieceMoveCalc{
     public KingMove(ChessBoard board, ChessPosition position, ChessPiece piece){
         super(board,position,piece);
     }
+    int[][] king_direction = {{0,1}, {0, -1}, {-1, -1}, {-1,0}, {1, 0}, {1, 1},{-1,1},{1,-1}};
     @Override
     public Collection<ChessMove> pieceMove(){
         Collection<ChessMove> moves = new ArrayList<>();
+        int row = position.getRow();
+        int col = position.getColumn();
+        for (int[] direction:king_direction){
+            int r = row + direction[0];
+            int c = col + direction[1];
 
+            if (inRange(r,c)){
+                ChessPosition end = new ChessPosition(r,c);
+                if (board.getPiece(end) == null){
+                    moves.add(new ChessMove(position,end,null));
+                }
+                else if (board.getPiece(end).getTeamColor() != piece.getTeamColor()){
+                    moves.add(new ChessMove(position,end,null));
+                }
+            }
+        }
         return moves;
     }
 }
